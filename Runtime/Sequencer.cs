@@ -15,6 +15,7 @@ namespace DifferentMethods.FuzzBall
         [SignalRange(0, 1)]
         public Signal glide = new Signal(1);
         public Signal frequencyMultiply = new Signal(1);
+        public int beatDivider = 1;
         public Signal transpose = new Signal(0);
         public string code = "";
 
@@ -54,6 +55,7 @@ namespace DifferentMethods.FuzzBall
             SyncControlSignal(signals, ref glide, ref control.glide);
             SyncControlSignal(signals, ref frequencyMultiply, ref control.frequencyMultiply);
             SyncControlSignal(signals, ref transpose, ref control.transpose);
+            beatDivider = control.beatDivider;
             this.code = control.code;
         }
 
@@ -145,34 +147,35 @@ namespace DifferentMethods.FuzzBall
         void NextBeat(float[] signals)
         {
             beatIndex++;
-            if (!notes.IsEmpty)
-            {
-                var note = notes.Peek();
-                if (note.beat <= beatIndex)
+            if (beatDivider == 0 || beatIndex % beatDivider == 0)
+                if (!notes.IsEmpty)
                 {
-                    position = 0;
-                    outputTrigger.SetValue(signals, 1);
-                    activeNote = notes.Pop();
-                    var tr = (int)transpose.GetValue(signals);
-                    if (tr != 0)
+                    var note = notes.Peek();
+                    if (note.beat <= beatIndex)
                     {
-                        if (activeNote.noteNumber >= 0)
-                            activeNote.hz = Note.Frequency(activeNote.noteNumber + tr);
-                        else
-                            activeNote.hz += tr;
+                        position = 0;
+                        outputTrigger.SetValue(signals, 1);
+                        activeNote = notes.Pop();
+                        var tr = (int)transpose.GetValue(signals);
+                        if (tr != 0)
+                        {
+                            if (activeNote.noteNumber >= 0)
+                                activeNote.hz = Note.Frequency(activeNote.noteNumber + tr);
+                            else
+                                activeNote.hz += tr;
+                        }
+                        activeNote.hz *= frequencyMultiply.GetValue(signals);
+                        if (notes.IsEmpty)
+                        {
+                            ChangeNoteTriggerPattern();
+                            ScheduleNoteTriggers(beatIndex + activeNote.duration);
+                        }
+                        nextNote = notes.Peek();
+                        if (tr != 0 && nextNote.noteNumber >= 0)
+                            nextNote.hz = Note.Frequency(nextNote.noteNumber + tr);
+                        nextNote.hz *= frequencyMultiply.GetValue(signals);
                     }
-                    activeNote.hz *= frequencyMultiply.GetValue(signals);
-                    if (notes.IsEmpty)
-                    {
-                        ChangeNoteTriggerPattern();
-                        ScheduleNoteTriggers(beatIndex + activeNote.duration);
-                    }
-                    nextNote = notes.Peek();
-                    if (tr != 0 && nextNote.noteNumber >= 0)
-                        nextNote.hz = Note.Frequency(nextNote.noteNumber + tr);
-                    nextNote.hz *= frequencyMultiply.GetValue(signals);
                 }
-            }
         }
 
         void ScheduleNoteTriggers(int startBeat)
