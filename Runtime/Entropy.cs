@@ -1,0 +1,42 @@
+using System;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+
+namespace DifferentMethods.FuzzBall
+{
+    public static class Entropy
+    {
+        static float[] values;
+        [ThreadStatic] static int index = 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Next()
+        {
+            index++;
+            if (index >= values.Length) index = 0;
+            return values[index];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Gradient(float t)
+        {
+            var firstIndex = (int)(t * (values.Length - 1)) % values.Length;
+            var nextIndex = (firstIndex + 1) % values.Length;
+            var frac = t - (int)(t);
+            return Mathf.Lerp(values[firstIndex], values[nextIndex], frac);
+        }
+
+        static Entropy()
+        {
+            var rnd = new System.Random(1024);
+            values = new float[8192];
+            for (var i = 0; i < values.Length; i++)
+            {
+                values[i] = ((float)rnd.Next() / int.MaxValue);
+            }
+        }
+
+
+    }
+
+}

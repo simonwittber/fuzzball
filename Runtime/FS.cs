@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using Fizzle.Designer;
+
+namespace DifferentMethods.FuzzBall
+{
+
+    public static class FS
+    {
+        static Stack<Synthesizer> stack = new Stack<Synthesizer>();
+
+        public static Osc Osc(OscType type, float freq, float amp = 1, float detune = 0, float bias = 0, float duty = 0.5f) => Synth.Add(new Osc(type, freq, amp, detune, bias, duty));
+        public static DelayLine DelayLine(float delay = 0.5f, float feedback = 0, float amp = 1) => Synth.Add(new DelayLine(delay, feedback, amp));
+        public static Filter Filter(FilterType type = FilterType.Lowpass, float cutoff = 440, float q = 1, float amp = 1) => Synth.Add(new Filter(type, cutoff, q, amp));
+        public static Sequencer Sequencer(SequencerType type = SequencerType.Up, float frequencyMultiply = 1f, float transpose = 0, float glide = 0f, string code = "") => Synth.Add(new Sequencer(type, frequencyMultiply, transpose, glide, code));
+        public static KarplusStrong KarplusStrong() => Synth.Add(new KarplusStrong());
+        public static Mixer Mixer(params Signal[] items) => Synth.Add(new Mixer(items));
+
+
+        static Synthesizer Synth
+        {
+            get
+            {
+                return stack.Peek();
+            }
+        }
+
+
+
+        internal static Synthesizer Begin()
+        {
+            var synth = new Synthesizer();
+            stack.Push(synth);
+            return synth;
+        }
+
+
+        internal static Synthesizer End()
+        {
+            var synth = stack.Pop();
+            synth.Init();
+            return synth;
+        }
+
+
+
+    }
+}
