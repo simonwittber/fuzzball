@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace DifferentMethods.FuzzBall
@@ -8,14 +9,19 @@ namespace DifferentMethods.FuzzBall
     {
         public Synthesizer synthesizer;
 
+        [NonSerialized] int signalCount = 1;
+        public float[] signals;
+
         void OnEnable()
         {
+            signalCount = 1;
             Init();
         }
 
         public void Init()
         {
             synthesizer = ConstructRack();
+            signals = new float[signalCount];
         }
 
         public virtual Synthesizer ConstructRack()
@@ -23,9 +29,22 @@ namespace DifferentMethods.FuzzBall
             throw new System.NotImplementedException();
         }
 
+        internal int NextOutputID()
+        {
+            return signalCount++;
+        }
+
         void OnAudioFilterRead(float[] data, int channels)
         {
-            synthesizer.ReadAudio(data, channels);
+            synthesizer.UpdateControl(signals);
+            for (var i = 0; i < data.Length; i += channels)
+            {
+                synthesizer.Tick(signals);
+                data[i + 0] = synthesizer.outputs[0].GetValue(signals);
+                data[i + 1] = synthesizer.outputs[1].GetValue(signals);
+            }
         }
+
+
     }
 }

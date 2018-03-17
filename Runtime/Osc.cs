@@ -23,7 +23,7 @@ namespace DifferentMethods.FuzzBall
 
         public AnimationCurve shape = AnimationCurve.Linear(0, -1, 1, 1);
 
-        [NonSerialized] float phase = 0, chainAmp = 1;
+        [NonSerialized] float phase = 0, chainAmp = 1, localAmp = 0;
 
 
 
@@ -83,7 +83,8 @@ namespace DifferentMethods.FuzzBall
         public override void Tick(float[] signals)
         {
             if (type == OscType.Noise && noiseBuffer == null) BuildNoiseBuffer();
-            var smp = BandLimit(bias.GetValue(signals) + Sample(signals) * amp.GetValue(signals));
+            localAmp = Lerp(localAmp, amp.GetValue(signals), 0.01f);
+            var smp = bias.GetValue(signals) + BandLimit(Sample(signals)) * localAmp;
             smp += chain.GetValue(signals) * chainAmp;
             output.SetValue(signals, smp);
             phase = phase + ((TWOPI * (freq.GetValue(signals) + detune.GetValue(signals))) / SAMPLERATE);

@@ -1,33 +1,33 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DifferentMethods.FuzzBall
 {
-
-    public class Synthesizer
+    [System.Serializable]
+    public class Synthesizer : RackItem<Synthesizer>
     {
-        static int signalCount = 1;
+
         public List<RackItem> rack = new List<RackItem>();
         int sampleIndex = 0;
-        public Signal[] audioOutput;
-        List<int> outputSignals = new List<int>();
-        List<int> inputSignals = new List<int>();
-        float[] signals;
+        public Signal[] outputs;
+
+        internal FizzSynth component;
 
         public Synthesizer()
         {
-            audioOutput = new Signal[7];
+            outputs = new Signal[2];
         }
 
         public void ConnectAudioOut(int channel, Signal signal)
         {
-            audioOutput[channel].id = signal.id;
+            outputs[channel].id = signal.id;
         }
 
         public int NextOutputID()
         {
-            return signalCount++;
+            return component.NextOutputID();
         }
 
         public T Add<T>(T item) where T : RackItem
@@ -37,25 +37,29 @@ namespace DifferentMethods.FuzzBall
             return item;
         }
 
-        public void ReadAudio(float[] data, int channels)
+        public override string ToString()
+        {
+            var racks = string.Join("\n", (from i in rack select i.ToString()));
+            var outs = string.Join("\n", (from i in outputs select i.ToString()));
+            return $"{racks}\n{outs}";
+        }
+
+        public override void Tick(float[] signals)
+        {
+            foreach (var item in rack)
+                item.Tick(signals);
+        }
+
+        public override void OnAddToRack(Synthesizer synth)
+        {
+            // outputs[0].id = synth.NextOutputID();
+            // outputs[1].id = synth.NextOutputID();
+        }
+
+        public override void UpdateControl(float[] signals)
         {
             foreach (var item in rack)
                 item.UpdateControl(signals);
-
-            for (var i = 0; i < data.Length; i += channels)
-            {
-                foreach (var id in outputSignals)
-                    signals[id] = 0;
-                foreach (var item in rack)
-                    item.Tick(signals);
-                for (var c = 0; c < channels; c++)
-                    data[i + c] = signals[audioOutput[c].id];
-            }
-        }
-
-        public void Init()
-        {
-            signals = new float[signalCount];
         }
     }
 }

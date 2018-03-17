@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace DifferentMethods.FuzzBall
 {
@@ -11,6 +12,11 @@ namespace DifferentMethods.FuzzBall
         public Signal amp = new Signal(1);
         [NonSerialized]
         Signal[] items;
+
+        public override string ToString()
+        {
+            return string.Join(", ", (from i in items select i.ToString())) + ", O:" + output.ToString();
+        }
 
         public Mixer(Signal[] items)
         {

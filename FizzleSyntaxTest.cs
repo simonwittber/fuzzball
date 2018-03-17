@@ -15,7 +15,7 @@ public class FizzleSyntaxTest : FizzSynth
 
     public override Synthesizer ConstructRack()
     {
-        synthesizer = Begin();
+        synthesizer = Begin(this);
         var o3 = Osc(OscType.Saw, 55);
         var o1 = Osc(OscType.Sin, 0.5f, amp: 0.5f, bias: 0.5f).ControlledBy(sound);
         var o2 = Osc(OscType.WaveShape, 220).ControlledBy(osc).ChainOutput(o3.output, 0.5f);
@@ -35,8 +35,8 @@ public class FizzleSyntaxTest : FizzSynth
 
         var m = Mixer(k.output, o2.output, o3.output).ControlledBy(mixer);
 
-        synthesizer.audioOutput[0].Connect(m.output);
-        synthesizer.audioOutput[1].Connect(f.output);
+        synthesizer.outputs[0].Connect(m.output);
+        synthesizer.outputs[1].Connect(f.output);
         return End();
     }
 

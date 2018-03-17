@@ -22,12 +22,14 @@ namespace DifferentMethods.FuzzBall
 
         public float GetValue(float[] signals)
         {
-            if (id == 0) return localValue;
-            return signals[id];
+            var value = (id == 0) ? localValue : signals[id];
+            if (float.IsNaN(value)) value = 0;
+            return value;
         }
 
         public void SetValue(float[] signals, float value)
         {
+            if (float.IsNaN(value)) value = 0;
             if (id == 0)
                 localValue = value;
             else

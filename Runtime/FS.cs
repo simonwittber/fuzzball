@@ -12,7 +12,7 @@ namespace DifferentMethods.FuzzBall
         public static Osc Osc(OscType type, float freq, float amp = 1, float detune = 0, float bias = 0, float duty = 0.5f) => Synth.Add(new Osc(type, freq, amp, detune, bias, duty));
         public static DelayLine DelayLine(float delay = 0.5f, float feedback = 0, float amp = 1) => Synth.Add(new DelayLine(delay, feedback, amp));
         public static Filter Filter(FilterType type = FilterType.Lowpass, float cutoff = 440, float q = 1, float amp = 1) => Synth.Add(new Filter(type, cutoff, q, amp));
-        public static Sequencer Sequencer(SequencerType type = SequencerType.Up, float frequencyMultiply = 1f, float transpose = 0, float glide = 0f, string code = "") => Synth.Add(new Sequencer(type, frequencyMultiply, transpose, glide, code));
+        public static Sequencer Sequencer(SequencerType type = SequencerType.Up, float frequencyMultiply = 1f, float transpose = 0, float glide = 0f, float amp = 1f, string code = "") => Synth.Add(new Sequencer(type, frequencyMultiply, transpose, glide, amp, code));
         public static KarplusStrong KarplusStrong() => Synth.Add(new KarplusStrong());
         public static Mixer Mixer(params Signal[] items) => Synth.Add(new Mixer(items));
 
@@ -27,9 +27,10 @@ namespace DifferentMethods.FuzzBall
 
 
 
-        internal static Synthesizer Begin()
+        internal static Synthesizer Begin(FizzSynth component)
         {
             var synth = new Synthesizer();
+            synth.component = component;
             stack.Push(synth);
             return synth;
         }
@@ -38,7 +39,6 @@ namespace DifferentMethods.FuzzBall
         internal static Synthesizer End()
         {
             var synth = stack.Pop();
-            synth.Init();
             return synth;
         }
 

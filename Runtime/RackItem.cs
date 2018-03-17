@@ -1,7 +1,9 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace DifferentMethods.FuzzBall
 {
+    [System.Serializable]
     public class RackItem
     {
         public static int SAMPLERATE = 44100;
@@ -28,12 +30,22 @@ namespace DifferentMethods.FuzzBall
                 C.localValue = A.GetValue(signals);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Lerp(float a, float b, float t)
+        {
+            return b * t + a * (1f - t);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float InverseLerp(float a, float b, float value)
+        {
+            return (value - a) / (b - a);
+        }
+
     }
 
     public class RackItem<T> : RackItem where T : class
     {
-
-
         [NonSerialized] protected T control;
 
         public T ControlledBy(T other)

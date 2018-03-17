@@ -6,14 +6,17 @@ using UnityEngine;
 
 namespace DifferentMethods.FuzzBall
 {
+
     [System.Serializable]
-    public partial class Sequencer : RackItem<Sequencer>
+    public class Sequencer : RackItem<Sequencer>
     {
 
         public SequencerType type;
         public AnimationCurve envelope = AnimationCurve.Constant(0, 1, 1);
         [SignalRange(0, 1)]
         public Signal glide = new Signal(1);
+        [SignalRange(0, 1)]
+        public Signal amp = new Signal(1);
         public Signal frequencyMultiply = new Signal(1);
         public int beatDivider = 1;
         public Signal transpose = new Signal(0);
@@ -33,12 +36,18 @@ namespace DifferentMethods.FuzzBall
         [NonSerialized] PriorityQueue<NoteTrigger> notes = new PriorityQueue<NoteTrigger>();
         [NonSerialized] NoteTrigger activeNote, nextNote;
 
-        public Sequencer(SequencerType type, float frequencyMultiply, float transpose, float glide, string code)
+        public override string ToString()
+        {
+            return $"SEQ {type} C:{code} G:{gate} OE:{outputEnvelope} OT:{outputTrigger} O:{output}";
+        }
+
+        public Sequencer(SequencerType type, float frequencyMultiply, float transpose, float glide, float amp, string code)
         {
             this.type = type;
             this.frequencyMultiply.localValue = frequencyMultiply;
             this.transpose.localValue = transpose;
             this.glide.localValue = glide;
+            this.amp.localValue = amp;
             this.code = code;
             Parse();
         }
@@ -53,6 +62,7 @@ namespace DifferentMethods.FuzzBall
             else
                 this.envelope.keys = control.envelope.keys;
             SyncControlSignal(signals, ref glide, ref control.glide);
+            SyncControlSignal(signals, ref amp, ref control.amp);
             SyncControlSignal(signals, ref frequencyMultiply, ref control.frequencyMultiply);
             SyncControlSignal(signals, ref transpose, ref control.transpose);
             beatDivider = control.beatDivider;
@@ -132,7 +142,7 @@ namespace DifferentMethods.FuzzBall
             var hz = activeNote.hz;
 
             var N = position * 1f / (beatDuration * activeNote.duration);
-            outputEnvelope.SetValue(signals, envelope.Evaluate(N));
+            outputEnvelope.SetValue(signals, envelope.Evaluate(N) * activeNote.volume * amp.GetValue(signals));
             var glideStart = (1f - glide.GetValue(signals));
             if (N >= glideStart)
             {
@@ -140,7 +150,6 @@ namespace DifferentMethods.FuzzBall
             }
             lastGate = gateValue;
             output.SetValue(signals, hz);
-
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
