@@ -46,9 +46,9 @@ namespace DifferentMethods.FuzzBall
                 float bw_Hz; //bandwidth of the current harmonic measured in Hz
                 float bwi;
                 float fi;
-                float rF = frequency * relF(nh);
+                float rF = frequency * RelF(nh);
 
-                bw_Hz = (Mathf.Pow(2.0f, bandwidth / 1200.0f) - 1.0f) * frequency * Mathf.Pow(relF(nh), bandwidthScale);
+                bw_Hz = (Mathf.Pow(2.0f, bandwidth / 1200.0f) - 1.0f) * frequency * Mathf.Pow(RelF(nh), bandwidthScale);
 
                 bwi = bw_Hz / (2.0f * samplerate);
                 fi = rF / samplerate;
@@ -56,7 +56,7 @@ namespace DifferentMethods.FuzzBall
                 for (i = 0; i < N / 2; i++)
                 {
                     float hprofile;
-                    hprofile = profile((i / (float)N) - fi, bwi);
+                    hprofile = Profile((i / (float)N) - fi, bwi);
                     freq_amp[i] += hprofile * A[nh];
                 }
             }
@@ -82,17 +82,17 @@ namespace DifferentMethods.FuzzBall
             for (i = 0; i < N; i++) waveOutput[i] /= max * 1.4142f;
         }
 
-        private void IFFT(float[] freq_real, float[] freq_imaginary, float[] samples)
+        void IFFT(float[] freq_real, float[] freq_imaginary, float[] samples)
         {
             throw new NotImplementedException();
         }
 
-        float relF(int N)
+        float RelF(int N)
         {
             return N;
         }
 
-        float profile(float fi, float bwi)
+        float Profile(float fi, float bwi)
         {
             float x = fi / bwi;
             x *= x;

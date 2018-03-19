@@ -10,7 +10,7 @@ namespace DifferentMethods.FuzzBall
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            var idProperty = property.FindPropertyRelative("id");
+            // var idProperty = property.FindPropertyRelative("id");
             var valueProperty = property.FindPropertyRelative("localValue");
             var attrs = fieldInfo.GetCustomAttributes(typeof(SignalRangeAttribute), true);
             if (attrs.Length > 0)
@@ -23,7 +23,5 @@ namespace DifferentMethods.FuzzBall
                 EditorGUI.PropertyField(position, valueProperty, label);
         }
     }
-
-
 
 }

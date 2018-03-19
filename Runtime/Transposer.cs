@@ -10,11 +10,6 @@ namespace DifferentMethods.FuzzBall
         public Signal bias = new Signal(0);
         [NonSerialized] public Signal output = new Signal();
 
-        [NonSerialized] float[] buffer = new float[44100 * 10];
-
-        [System.NonSerialized] float time = 0;
-        [System.NonSerialized] int index = 0;
-
         public Transposer(float multiply, float bias)
         {
             this.multiply.localValue = multiply;

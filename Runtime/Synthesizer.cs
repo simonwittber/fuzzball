@@ -10,7 +10,6 @@ namespace DifferentMethods.FuzzBall
     {
 
         public List<RackItem> rack = new List<RackItem>();
-        int sampleIndex = 0;
         public Signal[] inputs;
         public Signal[] outputs;
 
