@@ -22,7 +22,7 @@ public class ProcMusic : FizzSynth
         s.transpose.Connect(tr.output);
 
         var o1 = KarplusStrong();
-        o1.decayProbability.localValue = 0.25f;
+        o1.sustain.localValue = 0.25f;
 
 
         o1.frequency.Connect(s.output);
