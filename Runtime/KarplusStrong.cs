@@ -19,7 +19,7 @@ namespace DifferentMethods.FuzzBall
         [NonSerialized] public Signal gate = new Signal();
         [NonSerialized] public Signal output = new Signal();
 
-        [NonSerialized] int period, loopCount, sampleIndex;
+        [NonSerialized] int period;
         [NonSerialized] float[,] wave = new float[6, 44100];
         [NonSerialized] int activeString = 0;
         [NonSerialized] float lastGate, position;
@@ -31,16 +31,22 @@ namespace DifferentMethods.FuzzBall
 
         public override void UpdateControl(float[] signals)
         {
+            if (control == null) return;
             SyncControlSignal(signals, ref frequency, ref control.frequency);
             SyncControlSignal(signals, ref minDecayCycles, ref control.minDecayCycles);
             SyncControlSignal(signals, ref decayProbability, ref control.decayProbability);
             SyncControlSignal(signals, ref amp, ref control.amp);
         }
 
-        void OnGate()
+        void OnGate(float[] signals)
         {
             activeString = (activeString + 1) % 6;
-            loopCount = 0;
+            period = Mathf.FloorToInt(SAMPLERATE / (Mathf.Epsilon + frequency.GetValue(signals)));
+            for (var i = 0f; i < period; i++)
+            {
+                wave[activeString, Mathf.FloorToInt(i)] = (Entropy.Next() * 2) - 1;
+            }
+
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -50,13 +56,11 @@ namespace DifferentMethods.FuzzBall
             if (gateValue > 0 && lastGate < 0)
             {
                 position = 0;
-                sampleIndex = 0;
-                OnGate();
+                OnGate(signals);
             }
             else
             {
                 position += (1f / Osc.SAMPLERATE);
-                sampleIndex++;
             }
             lastGate = gateValue;
             var smp = Sample(signals);
@@ -68,37 +72,25 @@ namespace DifferentMethods.FuzzBall
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         float Sample(float[] signals)
         {
-            var freq = frequency.GetValue(signals);
-            if (Mathf.Approximately(freq, 0)) return 0;
-
-            var periodF = (SAMPLERATE / (Mathf.Epsilon + frequency.GetValue(signals)));
-            period = (int)periodF;
+            period = Mathf.FloorToInt(SAMPLERATE / (Mathf.Epsilon + frequency.GetValue(signals)));
             if (period <= 0) return 0;
-            var frac = periodF - period;
-
-            var si = sampleIndex % period;
-            if (si == 0) loopCount++;
-
+            var duration = period * (1f / SAMPLERATE);
+            var sif = (position % duration) * SAMPLERATE;
+            var si = (int)sif;
+            var ni = (si + 1) % 44100;
+            var frac = sif - si;
             var smp = 0f;
-            if (sampleIndex < period)
-            {
-                smp = (Entropy.Next() * 2) - 1;
-                wave[activeString, si] += smp;
-            }
-
-            var doFilter = sampleIndex > period;
             for (var i = 0; i < 6; i++)
             {
-                if (!(doFilter && activeString == i))
+                var current = wave[i, si];
+                if (Entropy.Next() < decayProbability.GetValue(signals))
                 {
-                    var prev = (si > 0 ? wave[i, si - 1] : 0);
-                    var mustFilter = sampleIndex < (period * minDecayCycles.GetValue(signals));
-                    if (mustFilter)
-                        wave[i, si] = (prev + wave[i, si]) * 0.5f;
-                    else if (Entropy.Next() <= decayProbability.GetValue(signals))
-                        wave[i, si] = (prev + wave[i, si]) * 0.5f;
-                    smp += Mathf.Lerp(wave[i, si], wave[i, (si + 1) % (period + 1)], frac);
+                    var prev = Lerp((si > 0 ? wave[i, si - 1] : 0), current, frac);
+                    current = Lerp(current, wave[i, ni], frac);
+                    current = (prev + current) * 0.5f;
                 }
+                wave[i, si] = current;
+                smp += current;
             }
             return smp;
         }

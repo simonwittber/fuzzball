@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace DifferentMethods.FuzzBall
@@ -32,37 +33,57 @@ namespace DifferentMethods.FuzzBall
             outputs[0].id = synth.NextOutputID();
             outputs[1].id = synth.NextOutputID();
 
+            if (SAMPLERATE != 44100)
+            {
+                var samplesPerMillisecond = 88;
+                var scaler = SAMPLERATE / 44100.0f;
+                samplesPerMillisecond = Mathf.FloorToInt(scaler * samplesPerMillisecond);
+                for (var i = 0; i < reverbDelay.Length; i++)
+                {
+                    var delay = Mathf.FloorToInt(scaler * reverbDelay[i]);
+                    if ((delay & 1) == 0)
+                    {
+                        delay++;
+                    }
+                    while (!IsPrime(delay))
+                        delay += 2;
+                    reverbDelay[i] = delay;
+                }
+            }
+
             allpass1 = new InternalDelayLine(reverbDelay[0]);
             allpass2 = new InternalDelayLine(reverbDelay[1]);
             comb1 = new InternalDelayLine(reverbDelay[2]);
             comb2 = new InternalDelayLine(reverbDelay[3]);
         }
 
+        bool IsPrime(int N)
+        {
+            if ((N & 1) == 1)
+            {
+                var upto = (int)Mathf.Sqrt(N);
+                for (var i = 3; i <= upto; i += 2)
+                {
+                    if (N % i == 0)
+                        return false;
+                }
+                return true;
+            }
+            else
+            {
+                return (N == 2);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void UpdateControl(float[] signals)
         {
             if (control == null) return;
             SyncControlSignal(signals, ref decay, ref control.decay);
             SyncControlSignal(signals, ref wet, ref control.wet);
-
-            // var samplesPerMillisecond = 88;
-            // if (SAMPLERATE != 44100)
-            // {
-            //     var scaler = SAMPLERATE / 44100.0f;
-            //     samplesPerMillisecond = Mathf.FloorToInt(scaler * samplesPerMillisecond);
-            //     for (var i = 0; i < reverbDelay.Length; i++)
-            //     {
-            //         var delay = Mathf.FloorToInt(scaler * reverbDelay[i]);
-            //         if ((delay & 1) == 0)
-            //         {
-            //             delay++;
-            //         }
-            //         while (!IsPrime(delay))
-            //             delay += 2;
-            //         reverbDelay[i] = delay;
-            //     }
-            // }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void Tick(float[] signals)
         {
             var fadeMix = wet.GetValue(signals);

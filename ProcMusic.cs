@@ -8,6 +8,7 @@ public class ProcMusic : FizzSynth
 {
     public Osc beat;
     public Reverb reverb;
+    public Saturator saturator;
 
     Synthesizer Bleeper()
     {
@@ -16,27 +17,20 @@ public class ProcMusic : FizzSynth
         var tr = Sequencer(code: "1,-1,0,3,5,-4", type: SequencerType.Random);
         tr.beatDivider = 16;
         tr.gate.Connect(b.output);
-        var s = Sequencer(code: "A3,C4,E4");
+        var s = Sequencer(code: "A3,C3,G#3:4,A2:2", type: SequencerType.Random, glide: 0.05f);
         s.gate.Connect(b.output);
         s.transpose.Connect(tr.output);
-        var o1 = Osc(OscType.Saw, 440);
 
-        var o2 = Osc(OscType.Saw, 0, detune: 1);
+        var o1 = KarplusStrong();
+        o1.decayProbability.localValue = 0.25f;
 
-        var tr2 = Transposer(1f, 3);
-        tr2.input.Connect(s.output);
 
-        o1.freq.Connect(s.output);
-        o2.freq.Connect(tr2.output);
-
-        var m = Mixer(o1.output, o2.output);
-
+        o1.frequency.Connect(s.output);
+        o1.gate.Connect(s.outputTrigger);
         o1.amp.Connect(s.outputEnvelope);
-        o2.amp.Connect(s.outputEnvelope);
 
-
-        synthesizer.outputs[0].Connect(m.output);
-        synthesizer.outputs[1].Connect(m.output);
+        synthesizer.outputs[0].Connect(o1.output);
+        synthesizer.outputs[1].Connect(o1.output);
 
         return End();
     }
