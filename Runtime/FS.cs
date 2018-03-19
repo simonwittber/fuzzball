@@ -15,6 +15,8 @@ namespace DifferentMethods.FuzzBall
         public static Sequencer Sequencer(SequencerType type = SequencerType.Up, float frequencyMultiply = 1f, float transpose = 0, float glide = 0f, float amp = 1f, string code = "") => Synth.Add(new Sequencer(type, frequencyMultiply, transpose, glide, amp, code));
         public static KarplusStrong KarplusStrong() => Synth.Add(new KarplusStrong());
         public static Mixer Mixer(params Signal[] items) => Synth.Add(new Mixer(items));
+        public static Transposer Transposer(float multiply, float bias) => Synth.Add(new Transposer(multiply, bias));
+        public static Reverb Reverb(float decay = 1, float wet = 1) => Synth.Add(new Reverb(decay, wet));
 
 
         static Synthesizer Synth

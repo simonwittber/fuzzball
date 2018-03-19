@@ -72,5 +72,4 @@ namespace DifferentMethods.FuzzBall
         [System.NonSerialized] int index = 0;
 
     }
-
 }

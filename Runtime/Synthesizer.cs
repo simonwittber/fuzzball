@@ -11,12 +11,14 @@ namespace DifferentMethods.FuzzBall
 
         public List<RackItem> rack = new List<RackItem>();
         int sampleIndex = 0;
+        public Signal[] inputs;
         public Signal[] outputs;
 
         internal FizzSynth component;
 
         public Synthesizer()
         {
+            inputs = new Signal[2];
             outputs = new Signal[2];
         }
 
@@ -52,8 +54,7 @@ namespace DifferentMethods.FuzzBall
 
         public override void OnAddToRack(Synthesizer synth)
         {
-            // outputs[0].id = synth.NextOutputID();
-            // outputs[1].id = synth.NextOutputID();
+
         }
 
         public override void UpdateControl(float[] signals)

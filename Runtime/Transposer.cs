@@ -15,6 +15,12 @@ namespace DifferentMethods.FuzzBall
         [System.NonSerialized] float time = 0;
         [System.NonSerialized] int index = 0;
 
+        public Transposer(float multiply, float bias)
+        {
+            this.multiply.localValue = multiply;
+            this.bias.localValue = bias;
+        }
+
         public override void OnAddToRack(Synthesizer synth)
         {
             output.id = synth.NextOutputID();
