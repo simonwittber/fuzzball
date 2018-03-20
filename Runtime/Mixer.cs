@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace DifferentMethods.FuzzBall
 {
+
     [System.Serializable]
     public class Mixer : RackItem<Mixer>
     {

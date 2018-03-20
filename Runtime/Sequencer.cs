@@ -52,15 +52,12 @@ namespace DifferentMethods.FuzzBall
             Parse();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void UpdateControl(float[] signals)
         {
             if (control == null) return;
             this.type = control.type;
-            if (this.envelope == null && control.envelope != null)
-                this.envelope = control.envelope;
-            else
-                this.envelope.keys = control.envelope.keys;
+            SyncControlSignal(signals, ref envelope, ref control.envelope);
             SyncControlSignal(signals, ref glide, ref control.glide);
             SyncControlSignal(signals, ref amp, ref control.amp);
             SyncControlSignal(signals, ref frequencyMultiply, ref control.frequencyMultiply);
@@ -121,7 +118,7 @@ namespace DifferentMethods.FuzzBall
             lastType = type;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void Tick(float[] signals)
         {
             sample++;
@@ -152,7 +149,7 @@ namespace DifferentMethods.FuzzBall
             output.SetValue(signals, hz);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         void NextBeat(float[] signals)
         {
             beatIndex++;
@@ -200,7 +197,7 @@ namespace DifferentMethods.FuzzBall
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         void ChangeNoteTriggerPattern()
         {
             switch (type)
@@ -214,13 +211,13 @@ namespace DifferentMethods.FuzzBall
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         void Reverse()
         {
             System.Array.Reverse(sequence);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         void Shuffle()
         {
             int n = sequence.Length;

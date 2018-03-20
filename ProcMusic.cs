@@ -47,13 +47,17 @@ public class ProcMusic : FizzSynth
     {
         var synthesizer = Begin(this);
         var b = Osc(OscType.Sin, 2).ControlledBy(beat);
-
+        var o = Osc(OscType.Tan, 880);
+        var z = Osc(OscType.Square, 880);
         var perc = Percussion().ControlledBy(percussion);
         perc.gate.Connect(b.output);
-        var n = Osc(OscType.Noise, 11025).ControlledBy(noise);
-
-        synthesizer.outputs[0].Connect(perc.output);
-        synthesizer.outputs[1].Connect(n.output);
+        var k = KarplusStrong();
+        k.frequency.localValue = 440;
+        k.gate.Connect(b.output);
+        var m = Mixer(perc.output, k.output, o.output, z.output);
+        // var m = Mixer(perc.output);
+        synthesizer.outputs[0].Connect(m.output);
+        synthesizer.outputs[1].Connect(m.output);
         return End();
     }
 

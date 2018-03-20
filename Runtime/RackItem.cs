@@ -36,16 +36,19 @@ namespace DifferentMethods.FuzzBall
             if (A == null && C != null)
                 A = C;
             else
-                A.keys = C.keys;
+            {
+                A = C;
+                // A.keys = C.keys;
+            }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public static float Lerp(float a, float b, float t)
         {
             return b * t + a * (1f - t);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public static float InverseLerp(float a, float b, float value)
         {
             return (value - a) / (b - a);

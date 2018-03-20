@@ -75,7 +75,7 @@ namespace DifferentMethods.FuzzBall
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void UpdateControl(float[] signals)
         {
             if (control == null) return;
@@ -83,7 +83,7 @@ namespace DifferentMethods.FuzzBall
             SyncControlSignal(signals, ref wet, ref control.wet);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void Tick(float[] signals)
         {
             var fadeMix = wet.GetValue(signals);

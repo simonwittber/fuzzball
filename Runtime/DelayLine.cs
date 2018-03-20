@@ -34,7 +34,7 @@ namespace DifferentMethods.FuzzBall
             this.amp.localValue = amp;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void UpdateControl(float[] signals)
         {
             if (this.control == null) return;
@@ -43,7 +43,7 @@ namespace DifferentMethods.FuzzBall
             SyncControlSignal(signals, ref amp, ref control.amp);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void Tick(float[] signals)
         {
             var bufferLength = buffer.Length;

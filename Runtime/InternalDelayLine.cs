@@ -23,7 +23,7 @@ namespace DifferentMethods.FuzzBall
             buffer = new float[length];
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public float Tick(float input)
         {
             var last = buffer[position];

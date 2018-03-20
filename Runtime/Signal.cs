@@ -29,7 +29,7 @@ namespace DifferentMethods.FuzzBall
 
         public void SetValue(float[] signals, float value)
         {
-            if (float.IsNaN(value)) value = 0;
+            // if (float.IsNaN(value)) value = 0;
             if (id == 0)
                 localValue = value;
             else

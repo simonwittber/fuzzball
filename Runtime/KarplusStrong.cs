@@ -49,7 +49,7 @@ namespace DifferentMethods.FuzzBall
 
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void Tick(float[] signals)
         {
             var gateValue = gate.GetValue(signals);
@@ -69,7 +69,7 @@ namespace DifferentMethods.FuzzBall
             output.SetValue(signals, smp);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         float Sample(float[] signals)
         {
             period = Mathf.FloorToInt(SAMPLERATE / (Mathf.Epsilon + frequency.GetValue(signals)));

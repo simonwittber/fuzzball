@@ -5,7 +5,6 @@ namespace DifferentMethods.FuzzBall
         WaveShape,
         Sin,
         Tan,
-        Noise,
         Square,
         Saw,
         Triangle,

@@ -18,8 +18,8 @@ namespace DifferentMethods.FuzzBall
         public static Transposer Transposer(float multiply, float bias) => Synth.Add(new Transposer(multiply, bias));
         public static Reverb Reverb(float decay = 1, float wet = 1) => Synth.Add(new Reverb(decay, wet));
         public static Percussion Percussion() => Synth.Add(new Percussion());
+        public static NoiseOsc NoiseOsc(float amp = 1, float bias = 0) => Synth.Add(new NoiseOsc(amp, bias));
         public static Saturator Saturator(float amt = 0.5f) => Synth.Add(new Saturator(amt));
-
 
         static Synthesizer Synth
         {
@@ -29,9 +29,7 @@ namespace DifferentMethods.FuzzBall
             }
         }
 
-
-
-        internal static Synthesizer Begin(FizzSynth component)
+        public static Synthesizer Begin(FizzSynth component)
         {
             var synth = new Synthesizer();
             synth.component = component;
@@ -39,14 +37,11 @@ namespace DifferentMethods.FuzzBall
             return synth;
         }
 
-
-        internal static Synthesizer End()
+        public static Synthesizer End()
         {
             var synth = stack.Pop();
             return synth;
         }
-
-
 
     }
 }

@@ -41,21 +41,18 @@ namespace DifferentMethods.FuzzBall
             output.id = synth.NextOutputID();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void UpdateControl(float[] signals)
         {
             if (control == null) return;
             type = control.type;
-            if (this.waveshaper == null && control.waveshaper != null)
-                this.waveshaper = control.waveshaper;
-            else
-                this.waveshaper.keys = control.waveshaper.keys;
+            SyncControlSignal(signals, ref waveshaper, ref control.waveshaper);
             SyncControlSignal(signals, ref cutoff, ref control.cutoff);
             SyncControlSignal(signals, ref q, ref control.q);
             SyncControlSignal(signals, ref amp, ref control.amp);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void Tick(float[] signals)
         {
             var smp = Sample(signals, input.GetValue(signals));
@@ -63,7 +60,7 @@ namespace DifferentMethods.FuzzBall
             output.SetValue(signals, smp);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         float Sample(float[] jacks, float smp)
         {
             var c = cutoff.GetValue(jacks);

@@ -6,9 +6,9 @@ namespace DifferentMethods.FuzzBall
 {
     public static class Entropy
     {
-        [ThreadStatic] static uint[] state;
+        [ThreadStatic] static uint[] state = new uint[] { 13, 29, 61, 1337 };
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public static float Next()
         {
             uint s, t;
@@ -21,16 +21,6 @@ namespace DifferentMethods.FuzzBall
             state[0] = t;
             return 1f * t / uint.MaxValue;
         }
-
-        static Entropy()
-        {
-            state = new uint[4];
-            state[0] = 13;
-            state[1] = 29;
-            state[2] = 61;
-            state[3] = 1337;
-        }
-
 
     }
 

@@ -23,19 +23,13 @@ namespace DifferentMethods.FuzzBall
 
         public AnimationCurve shape = AnimationCurve.Linear(0, -1, 1, 1);
 
-        [NonSerialized] float phase = 0, chainAmp = 1, localAmp = 0;
+        [NonSerialized] float phase = 0, localAmp = 0;
 
 
 
         public override string ToString()
         {
             return $"OSC: {type} F{freq} A{amp} B{bias} DU{duty} DE{detune} OUT:{output}";
-        }
-
-        public Osc ChainOutput(Signal output, float amp = 1f)
-        {
-            chainAmp = amp;
-            return this;
         }
 
         public Osc(OscType type, float freq, float amp, float detune, float bias, float duty)
@@ -53,7 +47,7 @@ namespace DifferentMethods.FuzzBall
             output.id = synth.NextOutputID();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void UpdateControl(float[] signals)
         {
             if (control == null) return;
@@ -63,28 +57,21 @@ namespace DifferentMethods.FuzzBall
             SyncControlSignal(signals, ref duty, ref control.duty);
             SyncControlSignal(signals, ref amp, ref control.amp);
             SyncControlSignal(signals, ref bias, ref control.bias);
-            if (this.shape == null && control.shape != null)
-                this.shape = control.shape;
-            else
-                this.shape.keys = control.shape.keys;
+            SyncControlSignal(signals, ref shape, ref control.shape);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void Tick(float[] signals)
         {
             localAmp = Lerp(localAmp, amp.GetValue(signals), 0.01f);
-            var smp = 0f;
-            if (type == OscType.Noise)
-                smp = bias.GetValue(signals) + (Entropy.Next() * 2 - 1) * localAmp;
-            else
-                smp = bias.GetValue(signals) + BandLimit(Sample(signals)) * localAmp;
+            var smp = bias.GetValue(signals) + BandLimit(Sample(signals)) * localAmp;
             output.SetValue(signals, smp);
             phase = phase + ((TWOPI * (freq.GetValue(signals) + detune.GetValue(signals))) / SAMPLERATE);
             if (phase > TWOPI)
                 phase -= TWOPI;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         protected float Sample(float[] signals)
         {
             switch (type)
@@ -112,7 +99,7 @@ namespace DifferentMethods.FuzzBall
         }
 
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         float BandLimit(float smp)
         {
             //This is a LPF at 22049hz.
@@ -123,7 +110,6 @@ namespace DifferentMethods.FuzzBall
             return yv[1];
         }
 
-        float[] noiseBuffer;
         float[] xv = new float[2], yv = new float[2];
     }
 

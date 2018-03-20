@@ -71,16 +71,16 @@ namespace DifferentMethods.FuzzBall
                 freq_real[i] = freq_amp[i] * Mathf.Cos(phase);
                 freq_imaginary[i] = freq_amp[i] * Mathf.Sin(phase);
             }
-            var waveOutput = Fourier.IDFT(freq_imaginary, freq_real);
+            // var waveOutput = Fourier.IDFT(freq_imaginary, freq_real);
             freq_real = null;
             freq_imaginary = null;
-            Debug.Log(waveOutput.Length);
             //normalize the output
             // float max = 0.0f;
             // for (i = 0; i < N; i++) if (Mathf.Abs(waveOutput[i]) > max) max = Mathf.Abs(waveOutput[i]);
             // if (max < 1e-5) max = (float)1e-5;
             // for (i = 0; i < N; i++) waveOutput[i] /= max * 1.4142f;
-            return waveOutput;
+            return null;
+            // return waveOutput;
         }
 
 

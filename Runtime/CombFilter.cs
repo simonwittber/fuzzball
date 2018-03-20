@@ -23,14 +23,14 @@ namespace DifferentMethods.FuzzBall
             this.delay.localValue = delay;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void UpdateControl(float[] signals)
         {
             if (this.control == null) return;
             SyncControlSignal(signals, ref delay, ref control.delay);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public override void Tick(float[] signals)
         {
             var bufferLength = buffer.Length;
