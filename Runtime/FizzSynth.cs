@@ -43,8 +43,8 @@ namespace DifferentMethods.FuzzBall
                 if (i % 1024 == 0)
                     synthesizer.UpdateControl(signals);
                 synthesizer.Tick(signals);
-                data[i + 0] = synthesizer.outputs[0].GetValue(signals);
-                data[i + 1] = synthesizer.outputs[1].GetValue(signals);
+                data[i + 0] = Mathf.Clamp(synthesizer.outputs[0].GetValue(signals), -1, 1);
+                data[i + 1] = Mathf.Clamp(synthesizer.outputs[1].GetValue(signals), -1, 1);
             }
         }
 

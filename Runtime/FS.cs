@@ -17,6 +17,7 @@ namespace DifferentMethods.FuzzBall
         public static Mixer Mixer(params Signal[] items) => Synth.Add(new Mixer(items));
         public static Transposer Transposer(float multiply, float bias) => Synth.Add(new Transposer(multiply, bias));
         public static Reverb Reverb(float decay = 1, float wet = 1) => Synth.Add(new Reverb(decay, wet));
+        public static Percussion Percussion() => Synth.Add(new Percussion());
         public static Saturator Saturator(float amt = 0.5f) => Synth.Add(new Saturator(amt));
 
 

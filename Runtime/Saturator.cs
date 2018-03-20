@@ -23,6 +23,7 @@ namespace DifferentMethods.FuzzBall
 
         public override void UpdateControl(float[] signals)
         {
+            if (control == null) return;
             SyncControlSignal(signals, ref amt, ref control.amt);
         }
 

@@ -10,7 +10,7 @@ namespace DifferentMethods.FuzzBall
         int number_harmonics;
         float[] A, freq_amp;
 
-        public PadSynth(int number_harmonics, int length = 262144, int sampleRate = 44100)
+        public PadSynth(int number_harmonics, int length = 880, int sampleRate = 44100)
         {
             this.N = length;
             this.samplerate = sampleRate;
@@ -34,7 +34,7 @@ namespace DifferentMethods.FuzzBall
             return A[n];
         }
 
-        public void CreateWave(float[] waveOutput, float frequency = 440f, float bandwidth = 25f, float bandwidthScale = 1f)
+        public float[] CreateWave(float frequency = 440f, float bandwidth = 25f, float bandwidthScale = 1f)
         {
             int i, nh;
 
@@ -67,25 +67,22 @@ namespace DifferentMethods.FuzzBall
             //Convert the freq_amp array to complex array (real/imaginary) by making the phases random
             for (i = 0; i < N / 2; i++)
             {
-                float phase = Entropy.Next() * 2.0f * 3.14159265358979f;
+                float phase = UnityEngine.Random.value * 2.0f * 3.14159265358979f;
                 freq_real[i] = freq_amp[i] * Mathf.Cos(phase);
                 freq_imaginary[i] = freq_amp[i] * Mathf.Sin(phase);
             }
-            IFFT(freq_real, freq_imaginary, waveOutput);
+            var waveOutput = Fourier.IDFT(freq_imaginary, freq_real);
             freq_real = null;
             freq_imaginary = null;
-
+            Debug.Log(waveOutput.Length);
             //normalize the output
-            float max = 0.0f;
-            for (i = 0; i < N; i++) if (Mathf.Abs(waveOutput[i]) > max) max = Mathf.Abs(waveOutput[i]);
-            if (max < 1e-5) max = (float)1e-5;
-            for (i = 0; i < N; i++) waveOutput[i] /= max * 1.4142f;
+            // float max = 0.0f;
+            // for (i = 0; i < N; i++) if (Mathf.Abs(waveOutput[i]) > max) max = Mathf.Abs(waveOutput[i]);
+            // if (max < 1e-5) max = (float)1e-5;
+            // for (i = 0; i < N; i++) waveOutput[i] /= max * 1.4142f;
+            return waveOutput;
         }
 
-        void IFFT(float[] freq_real, float[] freq_imaginary, float[] samples)
-        {
-            throw new NotImplementedException();
-        }
 
         float RelF(int N)
         {

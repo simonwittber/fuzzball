@@ -18,7 +18,7 @@ namespace DifferentMethods.FuzzBall
         [SignalRange(0, 1)]
         public Signal amp = new Signal(1);
         public Signal bias = new Signal(0);
-        [NonSerialized] public Signal chain;
+
         [NonSerialized] public Signal output;
 
         public AnimationCurve shape = AnimationCurve.Linear(0, -1, 1, 1);
@@ -34,7 +34,6 @@ namespace DifferentMethods.FuzzBall
 
         public Osc ChainOutput(Signal output, float amp = 1f)
         {
-            chain.id = output.id;
             chainAmp = amp;
             return this;
         }
@@ -52,15 +51,6 @@ namespace DifferentMethods.FuzzBall
         public override void OnAddToRack(Synthesizer synth)
         {
             output.id = synth.NextOutputID();
-            if (type == OscType.Noise)
-                BuildNoiseBuffer();
-        }
-
-        private void BuildNoiseBuffer()
-        {
-            noiseBuffer = new float[SAMPLERATE * 10];
-            for (var i = 0; i < noiseBuffer.Length; i++)
-                noiseBuffer[i] = Mathf.Lerp(-1, 1, Entropy.Next());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -82,10 +72,12 @@ namespace DifferentMethods.FuzzBall
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void Tick(float[] signals)
         {
-            if (type == OscType.Noise && noiseBuffer == null) BuildNoiseBuffer();
             localAmp = Lerp(localAmp, amp.GetValue(signals), 0.01f);
-            var smp = bias.GetValue(signals) + BandLimit(Sample(signals)) * localAmp;
-            smp += chain.GetValue(signals) * chainAmp;
+            var smp = 0f;
+            if (type == OscType.Noise)
+                smp = bias.GetValue(signals) + (Entropy.Next() * 2 - 1) * localAmp;
+            else
+                smp = bias.GetValue(signals) + BandLimit(Sample(signals)) * localAmp;
             output.SetValue(signals, smp);
             phase = phase + ((TWOPI * (freq.GetValue(signals) + detune.GetValue(signals))) / SAMPLERATE);
             if (phase > TWOPI)
@@ -114,8 +106,6 @@ namespace DifferentMethods.FuzzBall
                         return -1f + (2 * 1f / Mathf.PI) * phase;
                     else
                         return 3f - (2 * 1f / Mathf.PI) * phase;
-                case OscType.Noise:
-                    return noiseBuffer[(int)(phase / TWOPI) % noiseBuffer.Length];
                 default:
                     return 0;
             }

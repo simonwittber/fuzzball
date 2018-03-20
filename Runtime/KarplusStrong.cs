@@ -12,7 +12,7 @@ namespace DifferentMethods.FuzzBall
         [SignalRange(0, 1)]
         public Signal feedback = new Signal(0.5f);
         [SignalRange(0, 1)]
-        public Signal sustain = new Signal(1);
+        public Signal damping = new Signal(1);
         [SignalRange(0, 1)]
         public Signal amp = new Signal(1);
 
@@ -34,7 +34,7 @@ namespace DifferentMethods.FuzzBall
             if (control == null) return;
             SyncControlSignal(signals, ref frequency, ref control.frequency);
             SyncControlSignal(signals, ref feedback, ref control.feedback);
-            SyncControlSignal(signals, ref sustain, ref control.sustain);
+            SyncControlSignal(signals, ref damping, ref control.damping);
             SyncControlSignal(signals, ref amp, ref control.amp);
         }
 
@@ -44,8 +44,7 @@ namespace DifferentMethods.FuzzBall
             period = Mathf.FloorToInt(SAMPLERATE / (Mathf.Epsilon + frequency.GetValue(signals)));
             for (var i = 0f; i < period; i++)
             {
-                // wave[activeString, Mathf.FloorToInt(i)] = ((Entropy.Next() * 2) - 1);
-                wave[activeString, Mathf.FloorToInt(i)] = Entropy.Next() > 0.5f ? 1 : -1;
+                wave[activeString, Mathf.FloorToInt(i)] = ((Entropy.Next() * 2) - 1);
             }
 
         }
@@ -84,11 +83,11 @@ namespace DifferentMethods.FuzzBall
             for (var i = 0; i < 6; i++)
             {
                 var current = wave[i, si];
-                if (Entropy.Next() < sustain.GetValue(signals))
+                if (Entropy.Next() < damping.GetValue(signals))
                 {
                     var prev = Lerp((si > 0 ? wave[i, si - 1] : 0), current, frac);
                     current = Lerp(current, wave[i, ni], frac);
-                    current = (prev + current) * 0.5f;
+                    current = (prev + current) * feedback.GetValue(signals);
                 }
                 wave[i, si] = current;
                 smp += current;

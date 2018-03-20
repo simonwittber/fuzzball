@@ -6,34 +6,29 @@ namespace DifferentMethods.FuzzBall
 {
     public static class Entropy
     {
-        static float[] values;
-        [ThreadStatic] static int index = 0;
+        [ThreadStatic] static uint[] state;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Next()
         {
-            index++;
-            if (index >= values.Length) index = 0;
-            return values[index];
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Gradient(float t)
-        {
-            var firstIndex = (int)(t * (values.Length - 1)) % values.Length;
-            var nextIndex = (firstIndex + 1) % values.Length;
-            var frac = t - (int)(t);
-            return Mathf.Lerp(values[firstIndex], values[nextIndex], frac);
+            uint s, t;
+            s = t = state[3];
+            t ^= t << 11;
+            t ^= t >> 8;
+            state[3] = state[2]; state[2] = state[1]; state[1] = s = state[0];
+            t ^= s;
+            t ^= s >> 19;
+            state[0] = t;
+            return 1f * t / uint.MaxValue;
         }
 
         static Entropy()
         {
-            var rnd = new System.Random(1024);
-            values = new float[8192];
-            for (var i = 0; i < values.Length; i++)
-            {
-                values[i] = ((float)rnd.Next() / int.MaxValue);
-            }
+            state = new uint[4];
+            state[0] = 13;
+            state[1] = 29;
+            state[2] = 61;
+            state[3] = 1337;
         }
 
 

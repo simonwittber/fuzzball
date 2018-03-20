@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace DifferentMethods.FuzzBall
 {
@@ -28,6 +29,14 @@ namespace DifferentMethods.FuzzBall
                 A.localValue = C.localValue;
             else
                 C.localValue = A.GetValue(signals);
+        }
+
+        protected void SyncControlSignal(float[] signals, ref AnimationCurve A, ref AnimationCurve C)
+        {
+            if (A == null && C != null)
+                A = C;
+            else
+                A.keys = C.keys;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
