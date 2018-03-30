@@ -23,7 +23,6 @@ namespace DifferentMethods.FuzzBall
             buffer = new float[length];
         }
 
-
         public float Tick(float input)
         {
             var last = buffer[position];
